@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">InjectAweme</string>
+    <string name="accessibility_description">抖音极速版自动做任务</string>
+    <string name="value_tv_enable_accessibility">开启无障碍服务</string>
+    <string name="value_btn_enable_accessibility_disabled">去开启</string>
+    <string name="value_btn_start_inject">开始执行</string>
+</resources>

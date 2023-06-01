@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Demos</string>
+    <string name="reset">Reset</string>
+    <string name="contributors">Contributors</string>
+    <string name="see_the_sauce">See the Sauce</string>
+    <string name="value_tv_go_inject_aweme">aweme</string>
+    <string name="value_tv_go_palm2">PaLM2</string>
+    <string name="value_tv_go_fit_editor">fit_editor</string>
+</resources>

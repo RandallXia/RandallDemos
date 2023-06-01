@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+rootProject.name = "Demos"
+include ':app'
+include ':PT_Base_Lib:architecture'
+includeBuild './PT_Base_Lib/versionPlugin'
+include ':injectaweme'
+include ':fiteditor'
+include ':palm2-android'

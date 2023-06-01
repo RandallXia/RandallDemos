@@ -1,0 +1,6 @@
+[submodule "PT_Base_Lib"]
+	path = PT_Base_Lib
+	url = git@github.com:RandallXia/PT_Base_Lib.git
+[submodule "palm2-android"]
+	path = palm2-android
+	url = git@github.com:RandallXia/palm2-android.git

@@ -1,0 +1,51 @@
+name: Android CI
+
+on:
+  push:
+    tags:
+      - V*
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # 获取基础依赖 submodule
+      - name: Checkout Submodule
+        uses: actions/checkout@v3
+        with:
+          repository: RandallXia/PT_Base_Lib
+          token: ${{ secrets.TOKEN }} # 连接仓库的token,需要单独配置
+          path: PT_Base_Lib # 仓库的根目录名
+
+      # 获取palm2 module
+      - name: Checkout Submodule
+        uses: actions/checkout@v3
+        with:
+          repository: RandallXia/palm2-android
+          token: ${{ secrets.TOKEN }} # 连接仓库的token,需要单独配置
+          path: palm2-android # 仓库的根目录名
+
+      - name: Grant execute permission for gradlew & Build & assemble with Gradle
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS_HUAWEI }}
+          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS_HUAWEI }}
+          ANDROID_KEY_PASS: ${{ secrets.ANDROID_KEY_PASS_HUAWEI }}
+          VERSION_CODE: 232301
+          VERSION_NAME: v0.0.1
+        run: chmod +x gradlew && ./gradlew assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: ReleaseApp
+          path: ${{ github.workspace }}/app/build/outputs/apk/release/
