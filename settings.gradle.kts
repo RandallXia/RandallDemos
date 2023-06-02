@@ -10,13 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        maven { url = uri("https://jitpack.io") }
     }
 }
 rootProject.name = "Demos"
-include ':app'
-include ':PT_Base_Lib:architecture'
-includeBuild './PT_Base_Lib/versionPlugin'
-include ':injectaweme'
-include ':fiteditor'
-include ':palm2-android'
+include(":app", ":PT_Base_Lib:architecture", ":injectaweme", ":fiteditor", ":palm2-android")
+includeBuild("./PT_Base_Lib/versionPlugin")
