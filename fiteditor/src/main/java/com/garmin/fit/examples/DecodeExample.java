@@ -108,12 +108,11 @@ public class DecodeExample {
         } catch (java.io.IOException e) {
             throw new RuntimeException("Error opening file " + args[0] + " [2]");
         }
+        LogUtils.d("Decoded FIT file " + args[0]);
 
+        String newFitFilePath = Environment.getExternalStorageDirectory().getPath() + "/Download/" + args[2].replace(" ", "").replace("-", "").replace(":", "") + ".fit";
         try {
-            sEncode = new FileEncoder(
-                    new java.io.File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + args[2].replace(" ", "").replace("-", "").replace(":", "") + ".fit"),
-                    Fit.ProtocolVersion.V2_0
-            );
+            sEncode = new FileEncoder(new java.io.File(newFitFilePath), Fit.ProtocolVersion.V2_0);
         } catch (FitRuntimeException e) {
             System.err.println("Error opening file ExampleActivity.fit");
             return;
@@ -164,7 +163,7 @@ public class DecodeExample {
             throw new RuntimeException(e);
         }
 
-        LogUtils.d("Decoded FIT file " + args[0] + ".");
+        LogUtils.d("Encoded FIT file " + newFitFilePath);
     }
 
     private static class Listener implements ActivityMesgListener, FileIdMesgListener, UserProfileMesgListener, DeviceInfoMesgListener, MonitoringMesgListener, RecordMesgListener,
