@@ -15,8 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.LogUtils
+import com.garmin.fit.examples.DecodeExample
 import com.randalldev.fiteditor.ui.theme.DemosTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FitInitActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,9 +33,9 @@ class FitInitActivity : ComponentActivity() {
 
         LogUtils.d(filesDir)
 
-        /*lifecycleScope.launch(Dispatchers.IO) {
-            DecodeExample.main(arrayOf("/sdcard/Download/2023-03-28-10-33-11.fit", "30"))
-        }*/
+        lifecycleScope.launch(Dispatchers.IO) {
+            DecodeExample.main(arrayOf("${Environment.getExternalStorageDirectory().path}/Download/230610080848.fit", "2023-06-10 08:08:48", "2023-07-23 08:08:48"))
+        }
 
         setContent {
             DemosTheme {

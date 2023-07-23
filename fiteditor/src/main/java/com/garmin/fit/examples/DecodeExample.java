@@ -8,8 +8,12 @@
 
 package com.garmin.fit.examples;
 
+import android.os.Environment;
+
+import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.TimeUtils;
 import com.garmin.fit.ActivityMesg;
 import com.garmin.fit.ActivityMesgListener;
 import com.garmin.fit.BatteryStatus;
@@ -40,7 +44,6 @@ import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.UserProfileMesgListener;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
 
 public class DecodeExample {
 
@@ -57,7 +60,14 @@ public class DecodeExample {
         Listener listener = new Listener();
         FileInputStream in;
 
-        System.out.printf("FIT Decode Example Application - Protocol %d.%d Profile %d.%d %s\n", Fit.PROTOCOL_VERSION_MAJOR, Fit.PROTOCOL_VERSION_MINOR, Fit.PROFILE_VERSION_MAJOR, Fit.PROFILE_VERSION_MINOR, Fit.PROFILE_TYPE);
+        System.out.printf(
+                "FIT Decode Example Application - Protocol %d.%d Profile %d.%d %s\n",
+                Fit.PROTOCOL_VERSION_MAJOR,
+                Fit.PROTOCOL_VERSION_MINOR,
+                Fit.PROFILE_VERSION_MAJOR,
+                Fit.PROFILE_VERSION_MINOR,
+                Fit.PROFILE_TYPE
+        );
 
         /*if (args.length != 1) {
             System.out.println("Usage: java -jar DecodeExample.jar <filename>");
@@ -71,14 +81,14 @@ public class DecodeExample {
         }
 
         try {
-            sDays = Integer.parseInt(args[1]);
+            sDays = (int) TimeUtils.getTimeSpan(args[1], args[2], TimeConstants.DAY);
             timeGap = 86500L * sDays;
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            if (!decode.checkFileIntegrity((InputStream) in)) {
+            if (!decode.checkFileIntegrity(in)) {
                 throw new RuntimeException("FIT file integrity failed.");
             }
         } catch (RuntimeException e) {
@@ -100,7 +110,10 @@ public class DecodeExample {
         }
 
         try {
-            sEncode = new FileEncoder(new java.io.File("/sdcard/Download/2023-03-26-10-33-11.fit"), Fit.ProtocolVersion.V2_0);
+            sEncode = new FileEncoder(
+                    new java.io.File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + args[2].replace(" ", "").replace("-", "").replace(":", "") + ".fit"),
+                    Fit.ProtocolVersion.V2_0
+            );
         } catch (FitRuntimeException e) {
             System.err.println("Error opening file ExampleActivity.fit");
             return;
@@ -114,7 +127,7 @@ public class DecodeExample {
         mesgBroadcaster.addListener((SessionMesgListener) listener);
         mesgBroadcaster.addListener((ActivityMesgListener) listener);
 
-        decode.addListener((DeveloperFieldDescriptionListener) listener);
+        decode.addListener(listener);
 
         try {
             decode.read(in, mesgBroadcaster, mesgBroadcaster);
@@ -151,16 +164,16 @@ public class DecodeExample {
             throw new RuntimeException(e);
         }
 
-        System.out.println("Decoded FIT file " + args[0] + ".");
+        LogUtils.d("Decoded FIT file " + args[0] + ".");
     }
 
-    private static class Listener implements ActivityMesgListener, FileIdMesgListener, UserProfileMesgListener, DeviceInfoMesgListener, MonitoringMesgListener, RecordMesgListener, DeveloperFieldDescriptionListener, SessionMesgListener {
+    private static class Listener implements ActivityMesgListener, FileIdMesgListener, UserProfileMesgListener, DeviceInfoMesgListener, MonitoringMesgListener, RecordMesgListener,
+            DeveloperFieldDescriptionListener, SessionMesgListener {
 
         @Override
         public void onMesg(FileIdMesg mesg) {
-            System.out.println("File ID:");
-
-            LogUtils.d(GsonUtils.toJson(mesg));
+            //System.out.println("File ID:");
+            //LogUtils.d(GsonUtils.toJson(mesg));
 
             mesg.getFields().forEach(field -> {
                 String name = field.getName();
@@ -198,8 +211,8 @@ public class DecodeExample {
 
         @Override
         public void onMesg(UserProfileMesg mesg) {
-            System.out.println("User profile:");
-            LogUtils.d(GsonUtils.toJson(mesg));
+            //System.out.println("User profile:");
+            //LogUtils.d(GsonUtils.toJson(mesg));
 
             if (mesg.getFriendlyName() != null) {
                 System.out.print("   Friendly Name: ");
@@ -227,9 +240,8 @@ public class DecodeExample {
 
         @Override
         public void onMesg(DeviceInfoMesg mesg) {
-            System.out.println("Device info:");
-
-            LogUtils.d(GsonUtils.toJson(mesg));
+            //System.out.println("Device info:");
+            //LogUtils.d(GsonUtils.toJson(mesg));
 
             sEncode.write(mesg);
 
@@ -266,8 +278,8 @@ public class DecodeExample {
 
         @Override
         public void onMesg(MonitoringMesg mesg) {
-            System.out.println("Monitoring:");
-            LogUtils.d(GsonUtils.toJson(mesg));
+            //System.out.println("Monitoring:");
+            //LogUtils.d(GsonUtils.toJson(mesg));
 
             if (mesg.getTimestamp() != null) {
                 System.out.print("   Timestamp: ");
@@ -296,9 +308,8 @@ public class DecodeExample {
 
         @Override
         public void onMesg(RecordMesg mesg) {
-            System.out.println("Record:");
-
-            LogUtils.d(GsonUtils.toJson(mesg));
+            //System.out.println("Record:");
+            //LogUtils.d(GsonUtils.toJson(mesg));
 
             mesg.getFields().forEach(field -> {
                 if ("timestamp".equals(field.getName())) {
@@ -307,10 +318,10 @@ public class DecodeExample {
             });
             sEncode.write(mesg);
 
-            printValues(mesg, RecordMesg.HeartRateFieldNum);
-            printValues(mesg, RecordMesg.CadenceFieldNum);
-            printValues(mesg, RecordMesg.DistanceFieldNum);
-            printValues(mesg, RecordMesg.SpeedFieldNum);
+            //printValues(mesg, RecordMesg.HeartRateFieldNum);
+            //printValues(mesg, RecordMesg.CadenceFieldNum);
+            //printValues(mesg, RecordMesg.DistanceFieldNum);
+            //printValues(mesg, RecordMesg.SpeedFieldNum);
 
             printDeveloperData(mesg);
         }
@@ -318,7 +329,7 @@ public class DecodeExample {
         @Override
         public void onMesg(SessionMesg mesg) {
             String session = GsonUtils.toJson(mesg);
-            LogUtils.d(session);
+            //LogUtils.d(session);
 
             mesg.getFields().forEach(field -> {
                 if (field.getName().equals("timestamp")) {
@@ -343,7 +354,7 @@ public class DecodeExample {
         @Override
         public void onMesg(ActivityMesg mesg) {
             String session = GsonUtils.toJson(mesg);
-            LogUtils.d(session);
+            //LogUtils.d(session);
 
             mesg.getFields().forEach(field -> {
                 if (field.getName().equals("timestamp")) {
