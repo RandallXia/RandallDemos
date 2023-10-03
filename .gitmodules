@@ -4,3 +4,7 @@
 [submodule "palm2-android"]
 	path = palm2-android
 	url = git@github.com:RandallXia/palm2-android.git
+[submodule "CpFastAccessibility"]
+	path = CpFastAccessibility
+	url = https://github.com/RandallXia/CpFastAccessibility.git
+	branch = develop
