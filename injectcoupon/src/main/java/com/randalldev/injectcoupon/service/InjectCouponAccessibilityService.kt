@@ -1,4 +1,4 @@
-package com.randalldev.injectaweme.service
+package com.randalldev.injectcoupon.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
@@ -13,6 +13,7 @@ import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
@@ -26,78 +27,32 @@ import kotlin.random.Random
  * @Date 2023-04-30.
  * @Time 10:48.
  */
-class InjectAwemeAccessibilityService : AccessibilityService() {
+class InjectCouponAccessibilityService : AccessibilityService() {
 
     private var timestamp = TimeUtils.getNowMills()
     private var taskRunning = false
+    private val mainExecutor = MainScope()
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        LogUtils.d(event.toString())
         event?.let { accessibilityEvent ->
             val randomGap = Random.nextFloat() * 20000
             when (accessibilityEvent.eventType) {
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
-                    if (accessibilityEvent.packageName.equals("com.ss.android.ugc.aweme.lite")) {
-                        when (accessibilityEvent.className) {
-                            "android.widget.ScrollView" -> {
+                    if (accessibilityEvent.packageName.equals("com.taobao.live")) {
 
-                                val nodeInfosByText = rootInActiveWindow?.findAccessibilityNodeInfosByText("去逛街")
-                                nodeInfosByText?.firstOrNull()?.let { clickByNode(this, it) }
-                                doAtLeast90sTask {
-                                    /*val nodeWatchMore = rootInActiveWindow?.findAccessibilityNodeInfosByText("看更多")
-                                    nodeWatchMore?.firstOrNull()?.let { clickByNode(this@InjectAwesomeAccessibilityService, it) }
-                                    doAtLeast90sTask {
-                                        val nodeWatchSomeCity = rootInActiveWindow?.findAccessibilityNodeInfosByText("去浏览")
-                                        nodeWatchSomeCity?.firstOrNull()?.let { clickByNode(this@InjectAwesomeAccessibilityService, it) }
-                                    }*/
-                                }
-                                //traverseView(rootInActiveWindow)
-                            }
 
-                            /*"androidx.recyclerview.widget.RecyclerView" -> {
-                                //recursionViewTree(rootInActiveWindow)
-                                GlobalScope.launch(Dispatchers.IO) {
-                                    flow {
-                                        repeat(50) {
-                                            delay(2000)
-                                            emit(it)
-                                        }
-                                    }.onCompletion {
-                                        performGlobalAction(GLOBAL_ACTION_BACK)
-                                    }.collect {
-                                        scrollByNode(this@InjectAwesomeAccessibilityService)
-                                    }
-                                }
-                            }*/
-
-                            "android.widget.FrameLayout" -> {
-                                if (TimeUtils.getNowMills() - timestamp > randomGap) {
-                                    timestamp = TimeUtils.getNowMills()
-                                    val viewpager =
-                                        rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.ss.android.ugc.aweme.lite:id/viewpager")
-
-                                    //runTasks(accessibilityEvent)
-
-                                    //recursionViewTree(rootInActiveWindow)
-
-                                    if (!viewpager.isNullOrEmpty()) {
-                                        val nodeInfo =
-                                            viewpager.firstOrNull {
-                                                it.contentDescription != null && it.contentDescription.equals(
-                                                    "视频"
-                                                )
-                                            }
-                                        nodeInfo?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
-                                    } else {
-
-                                    }
-                                } else {
-
-                                }
-                            }
-
-                            else -> {}
+//                        mainExecutor.launch {
+                        val rootNode = rootInActiveWindow
+                        printNodeInfo(rootNode, 30)
+                        val accessibilityNodeInfos = rootNode.findAccessibilityNodeInfosByText("看小视频30秒(0/10)")
+//                            val nodeList = delayUntilFindByText("看小视频30秒(0/10)", 200)
+                        if (accessibilityNodeInfos.isNotEmpty()) {
+                            printNodeInfo(accessibilityNodeInfos.first(), 10)
+                            performClickUntilClickable(accessibilityNodeInfos.first())
+//                                delay(5000)
+                            doAtLeast90sTask { }
                         }
+//                        }
 
                     } else {
 
@@ -135,8 +90,8 @@ class InjectAwemeAccessibilityService : AccessibilityService() {
         if (!taskRunning) {
             GlobalScope.launch(Dispatchers.IO) {
                 flow {
-                    delay(3000)
-                    repeat(50) {
+//                    delay(3000)
+                    repeat(15) {
                         delay(2000)
                         emit(it)
                     }
@@ -148,7 +103,7 @@ class InjectAwemeAccessibilityService : AccessibilityService() {
                         taskRunning = false
                         afterCompleted.invoke()
                     }.collect {
-                        scrollByNode(this@InjectAwemeAccessibilityService)
+                        scrollByNode(this@InjectCouponAccessibilityService)
                         if (it == 49) {
                             val action = performGlobalAction(GLOBAL_ACTION_BACK)
                             LogUtils.d("action perform result: $action")
@@ -182,6 +137,28 @@ class InjectAwemeAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() {
         LogUtils.w("accessibility was interrupted!")
+    }
+
+    private suspend fun delayUntilFindByText(nodeText: String, delayTime: Long): List<AccessibilityNodeInfo> {
+        val rootNode = this.rootInActiveWindow ?: return delayUntilFindByText(nodeText, delayTime)
+        val accessibilityNodeInfos = rootNode.findAccessibilityNodeInfosByText(nodeText)
+        if (accessibilityNodeInfos != null && accessibilityNodeInfos.isNotEmpty()) {
+            return accessibilityNodeInfos
+        } else {
+            delay(delayTime)
+            return delayUntilFindByText(nodeText, delayTime)
+        }
+    }
+
+    private fun performClickUntilClickable(view: AccessibilityNodeInfo): Boolean {
+        if (view.isClickable) {
+            view.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+            return true
+        } else {
+            val parent = view.parent ?: return false
+            performClickUntilClickable(parent)
+        }
+        return false
     }
 
     private fun clickByNode(service: AccessibilityService?, nodeInfo: AccessibilityNodeInfo?): Boolean {
@@ -262,6 +239,33 @@ class InjectAwemeAccessibilityService : AccessibilityService() {
             builder.append("IsPassword: ${nodeInfo.isPassword}\n")
             builder.append("IsScrollable: ${nodeInfo.isScrollable}")
             return builder.toString()
+        }
+    }
+
+    private fun printNodeInfo(node: AccessibilityNodeInfo?, depth: Int) {
+        if (node == null) {
+            return
+        }
+
+        // 打印节点信息
+        val sb = java.lang.StringBuilder()
+        for (i in 0 until depth) {
+            sb.append("  ")
+        }
+        sb.append("Text: ").append(node.text).append(", ")
+        sb.append("Class: ").append(node.className).append(", ")
+        sb.append("ID: ").append(node.viewIdResourceName).append(", ")
+        sb.append("PACKAGE: ").append(node.packageName)
+        LogUtils.d(sb.toString())
+
+        // 递归遍历子节点
+        val childCount = node.childCount
+        for (i in 0 until childCount) {
+            val childNode = node.getChild(i)
+            if (childNode != null) {
+                printNodeInfo(childNode, depth + 1)
+                childNode.recycle()
+            }
         }
     }
 }

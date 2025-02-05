@@ -81,7 +81,7 @@ public class DecodeExample {
         }
 
         try {
-            sDays = (int) TimeUtils.getTimeSpan(args[1], args[2], TimeConstants.DAY);
+            sDays = (int) TimeUtils.getTimeSpan(args[2], args[1], TimeConstants.DAY);
             timeGap = 86500L * sDays;
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);

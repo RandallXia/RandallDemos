@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.randalldev.injectaweme"
+    namespace = "com.randalldev.injectcoupon"
     compileSdk = BuildConfig.compileSdkVersion
 
     defaultConfig {
@@ -34,6 +34,7 @@ android {
 dependencies {
 
     implementation(project(":PT_Base_Lib:architecture"))
+    implementation(project(":CpFastAccessibility:cp-fast-accessibility"))
 
     testImplementation(Depend.junit)
     androidTestImplementation(Depend.androidTestJunit)

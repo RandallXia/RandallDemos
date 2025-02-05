@@ -1,15 +1,15 @@
-package com.randalldev.injectaweme
+package com.randalldev.injectcoupon
 
 import android.accessibilityservice.AccessibilityService
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
 import androidx.activity.ComponentActivity
-import com.randalldev.injectaweme.databinding.ActivitySetupBinding
-import com.randalldev.injectaweme.service.InjectAwemeAccessibilityService
+import com.blankj.utilcode.util.LogUtils
+import com.randalldev.injectcoupon.databinding.ActivitySetupBinding
+import com.randalldev.injectcoupon.service.InjectCouponAccessibilityService
 
 class SetupActivity : ComponentActivity() {
 
@@ -22,20 +22,23 @@ class SetupActivity : ComponentActivity() {
         setContentView(binding.root)
 
         binding.btnEnableAccessibility.setOnClickListener {
-            if (!isAccessibilitySettingsOn(InjectAwemeAccessibilityService::class.java)) {
+            if (!isAccessibilitySettingsOn(InjectCouponAccessibilityService::class.java)) {
                 startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            } else {
+                binding.btnEnableAccessibility.text = "已启用"
             }
         }
 
         binding.btnStartInject.setOnClickListener {
-            if (isAccessibilitySettingsOn(InjectAwemeAccessibilityService::class.java)) {
-                Intent(Intent.ACTION_MAIN)
+            LogUtils.d("isAccessibilitySettingsOn: ${isAccessibilitySettingsOn(InjectCouponAccessibilityService::class.java)}")
+            if (isAccessibilitySettingsOn(InjectCouponAccessibilityService::class.java)) {
+                /*Intent(Intent.ACTION_MAIN)
                     .apply {
                         component =
                             ComponentName("com.ss.android.ugc.aweme.lite", "com.ss.android.ugc.aweme.splash.SplashActivity")
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         startActivity(this)
-                    }
+                    }*/
             }
         }
     }
@@ -53,7 +56,10 @@ fun Context.isAccessibilitySettingsOn(clazz: Class<out AccessibilityService?>): 
     if (accessibilityEnabled) {
         // 获取启用的无障碍服务
         val settingValue: String? =
-            Settings.Secure.getString(applicationContext.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+            Settings.Secure.getString(
+                applicationContext.contentResolver,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            )
         if (settingValue != null) {
             // 遍历判断是否包含我们的服务
             mStringColonSplitter.setString(settingValue)

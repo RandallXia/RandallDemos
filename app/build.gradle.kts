@@ -80,8 +80,8 @@ android {
 dependencies {
 
     implementation(project(":PT_Base_Lib:architecture"))
-    implementation(project(":injectaweme"))
-    implementation(project(":palm2-android"))
+    implementation(project(":injectcoupon"))
+    //implementation(project(":palm2-android"))
     implementation(project(":fiteditor"))
 
     testImplementation(Depend.junit)
@@ -90,13 +90,9 @@ dependencies {
 
     implementation(AndroidX.activityKtx)
     implementation(AndroidX.fragmentKtx)
-    implementation(AndroidX.ktxReflect)
     implementation(AndroidX.lifecycleLiveData)
     implementation(AndroidX.lifecycleViewModel)
     implementation(AndroidX.paging)
-    implementation(Kt.coroutinesCore)
-    implementation(Kt.coroutinesAndroid)
-    implementation(Kt.coroutinesRetrofit)
     // DI
     implementation(Hilt.dagger)
     kapt(Hilt.daggerCompiler)

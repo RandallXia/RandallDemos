@@ -18,8 +18,8 @@ rootProject.name = "Demos"
 include(
     ":app",
     ":PT_Base_Lib:architecture",
-    ":injectaweme", ":fiteditor",
-    ":palm2-android",
+    ":injectcoupon", ":fiteditor",
+    //":palm2-android",
     ":CpFastAccessibility:cp-fast-accessibility",
 )
 includeBuild("./PT_Base_Lib/versionPlugin")

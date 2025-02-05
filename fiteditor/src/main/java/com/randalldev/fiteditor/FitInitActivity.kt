@@ -34,7 +34,13 @@ class FitInitActivity : ComponentActivity() {
         LogUtils.d(filesDir)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            DecodeExample.main(arrayOf("${Environment.getExternalStorageDirectory().path}/Download/230610080848.fit", "2023-06-10 08:08:48", "2023-07-23 08:08:48"))
+            DecodeExample.main(
+                arrayOf(
+                    "${Environment.getExternalStorageDirectory().path}/Download/230929085316.fit",
+                    "2023-09-29 08:53:16",
+                    "2023-09-30 08:53:16",
+                )
+            )
         }
 
         setContent {
