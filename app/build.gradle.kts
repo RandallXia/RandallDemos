@@ -3,7 +3,6 @@ import com.randallpt.versionplugin.BuildConfig
 import com.randallpt.versionplugin.Depend
 import com.randallpt.versionplugin.Glide
 import com.randallpt.versionplugin.Hilt
-import com.randallpt.versionplugin.Kt
 import com.randallpt.versionplugin.Moshi
 
 plugins {
@@ -81,8 +80,8 @@ dependencies {
 
     implementation(project(":PT_Base_Lib:architecture"))
     implementation(project(":injectcoupon"))
-    //implementation(project(":palm2-android"))
     implementation(project(":fiteditor"))
+    implementation(project(":CpFastAccessibility:cp-fast-accessibility"))
 
     testImplementation(Depend.junit)
     androidTestImplementation(Depend.androidTestJunit)

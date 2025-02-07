@@ -8,16 +8,20 @@ import android.graphics.Rect
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import cn.coderpig.cp_fast_accessibility.AnalyzeSourceResult
+import cn.coderpig.cp_fast_accessibility.EventWrapper
+import cn.coderpig.cp_fast_accessibility.FastAccessibilityService
+import cn.coderpig.cp_fast_accessibility.click
+import cn.coderpig.cp_fast_accessibility.findNodeByText
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.TimeUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -27,31 +31,80 @@ import kotlin.random.Random
  * @Date 2023-04-30.
  * @Time 10:48.
  */
-class InjectCouponAccessibilityService : AccessibilityService() {
+class InjectCouponAccessibilityService : FastAccessibilityService() {
 
     private var timestamp = TimeUtils.getNowMills()
     private var taskRunning = false
     private val mainExecutor = MainScope()
 
+    override fun analyzeCallBack(wrapper: EventWrapper?, result: AnalyzeSourceResult) {
+        wrapper?.let {
+//            LogUtils.d("event comes: ${wrapper.eventType} ${wrapper.packageName} ${wrapper.className}")
+            if (wrapper.packageName == "com.taobao.live") {
+
+                result.findNodeByText("残忍离开")?.let {
+                    LogUtils.d("node found: ${it.className} ${it.nodeInfo}")
+                    it.click()
+                }
+
+                result.findNodeByText("看小视频30秒")?.let {
+                    if (it.text != "看小视频30秒(10/10)" && !taskRunning) {
+                        LogUtils.d("node found: ${it.className} ${it.nodeInfo}")
+                        taskRunning = true
+                        it.click()
+                        doScrollTask(17, 3000) { }
+                    }
+                }
+
+                result.findNodeByText("看精彩内容30秒")?.let {
+                    if (it.text != "看精彩内容30秒(10/10)" && !taskRunning) {
+                        LogUtils.d("node found: ${it.className} ${it.nodeInfo}")
+                        taskRunning = true
+                        it.click()
+                        doScrollTask(17, 3000) { }
+                    }
+                }
+
+                result.findNodeByText("看直播60秒")?.let {
+                    if (it.text != "看直播60秒(10/10)" && !taskRunning) {
+                        LogUtils.d("node found: ${it.className} ${it.nodeInfo}")
+                        taskRunning = true
+                        it.click()
+                        doScrollTask(4, 20000) { }
+                    }
+                }
+
+                result.findNodeByText("看直播3分钟")?.let {
+                    if (it.text != "看直播3分钟(3/3)" && !taskRunning) {
+                        taskRunning = true
+                        LogUtils.d("node found: ${it.className} ${it.nodeInfo}")
+                        it.click()
+                        doScrollTask(12, 20000) { }
+                    }
+                }
+            }
+        }
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        super.onAccessibilityEvent(event)
         event?.let { accessibilityEvent ->
-            val randomGap = Random.nextFloat() * 20000
             when (accessibilityEvent.eventType) {
                 AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
                     if (accessibilityEvent.packageName.equals("com.taobao.live")) {
 
-
 //                        mainExecutor.launch {
-                        val rootNode = rootInActiveWindow
-                        printNodeInfo(rootNode, 30)
-                        val accessibilityNodeInfos = rootNode.findAccessibilityNodeInfosByText("看小视频30秒(0/10)")
+//                            val rootNode = rootInActiveWindow
+//                        printNodeInfo(rootInActiveWindow, 30)
+//                            val accessibilityNodeInfos =
+//                                rootNode.findAccessibilityNodeInfosByText("看小视频30秒(0/10)")
 //                            val nodeList = delayUntilFindByText("看小视频30秒(0/10)", 200)
-                        if (accessibilityNodeInfos.isNotEmpty()) {
-                            printNodeInfo(accessibilityNodeInfos.first(), 10)
-                            performClickUntilClickable(accessibilityNodeInfos.first())
+//                            if (accessibilityNodeInfos.isNotEmpty()) {
+//                                printNodeInfo(accessibilityNodeInfos.first(), 10)
+//                                performClickUntilClickable(accessibilityNodeInfos.first())
 //                                delay(5000)
-                            doAtLeast90sTask { }
-                        }
+//                                doAtLeast90sTask { }
+//                            }
 //                        }
 
                     } else {
@@ -61,24 +114,24 @@ class InjectCouponAccessibilityService : AccessibilityService() {
 
                 AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
 
-                    val nodeInfosA5 =
-                        rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.ss.android.ugc.aweme:id/a-5")
-                    if (!nodeInfosA5.isNullOrEmpty()) {
-                        nodeInfosA5.forEach {
-                            it.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                        }
-                    } else {
-
-                    }
-                    val nodeInfosHox =
-                        rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.ss.android.ugc.aweme:id/hox")
-                    if (!nodeInfosHox.isNullOrEmpty()) {
-                        nodeInfosHox.forEach {
-                            it.parent.parent.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                        }
-                    } else {
-
-                    }
+//                    val nodeInfosA5 =
+//                        rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.ss.android.ugc.aweme:id/a-5")
+//                    if (!nodeInfosA5.isNullOrEmpty()) {
+//                        nodeInfosA5.forEach {
+//                            it.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+//                        }
+//                    } else {
+//
+//                    }
+//                    val nodeInfosHox =
+//                        rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.ss.android.ugc.aweme:id/hox")
+//                    if (!nodeInfosHox.isNullOrEmpty()) {
+//                        nodeInfosHox.forEach {
+//                            it.parent.parent.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+//                        }
+//                    } else {
+//
+//                    }
                 }
 
                 else -> {}
@@ -86,38 +139,28 @@ class InjectCouponAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun doAtLeast90sTask(afterCompleted: () -> Unit) {
+    private fun doScrollTask(
+        repeatTimes: Int, scrollGap: Long, afterCompleted: () -> Unit
+    ) {
         if (!taskRunning) {
-            GlobalScope.launch(Dispatchers.IO) {
+            mainExecutor.launch(Dispatchers.IO) {
                 flow {
-//                    delay(3000)
-                    repeat(15) {
-                        delay(2000)
+                    delay(3000)
+                    repeat(repeatTimes) {
+                        delay(scrollGap)
                         emit(it)
                     }
+                }.onCompletion {
+                    taskRunning = false
+                    afterCompleted.invoke()
+                }.collect {
+                    scrollByNode(this@InjectCouponAccessibilityService)
+                    if (it == (repeatTimes - 1)) {
+                        val action = performGlobalAction(GLOBAL_ACTION_BACK)
+                        LogUtils.d("action perform result: $action")
+                    }
                 }
-                    .onStart {
-                        taskRunning = true
-                    }
-                    .onCompletion {
-                        taskRunning = false
-                        afterCompleted.invoke()
-                    }.collect {
-                        scrollByNode(this@InjectCouponAccessibilityService)
-                        if (it == 49) {
-                            val action = performGlobalAction(GLOBAL_ACTION_BACK)
-                            LogUtils.d("action perform result: $action")
-                        }
-                    }
             }
-        }
-    }
-
-    private fun runTasks(event: AccessibilityEvent) {
-        val nodeInfosByViewId =
-            rootInActiveWindow.findAccessibilityNodeInfosByViewId("com.ss.android.ugc.aweme.lite:id/evv")
-        if (!nodeInfosByViewId.isNullOrEmpty()) {
-            clickByNode(this, nodeInfosByViewId[0])
         }
     }
 
@@ -139,7 +182,9 @@ class InjectCouponAccessibilityService : AccessibilityService() {
         LogUtils.w("accessibility was interrupted!")
     }
 
-    private suspend fun delayUntilFindByText(nodeText: String, delayTime: Long): List<AccessibilityNodeInfo> {
+    private suspend fun delayUntilFindByText(
+        nodeText: String, delayTime: Long
+    ): List<AccessibilityNodeInfo> {
         val rootNode = this.rootInActiveWindow ?: return delayUntilFindByText(nodeText, delayTime)
         val accessibilityNodeInfos = rootNode.findAccessibilityNodeInfosByText(nodeText)
         if (accessibilityNodeInfos != null && accessibilityNodeInfos.isNotEmpty()) {
@@ -161,7 +206,9 @@ class InjectCouponAccessibilityService : AccessibilityService() {
         return false
     }
 
-    private fun clickByNode(service: AccessibilityService?, nodeInfo: AccessibilityNodeInfo?): Boolean {
+    private fun clickByNode(
+        service: AccessibilityService?, nodeInfo: AccessibilityNodeInfo?
+    ): Boolean {
         if (service == null || nodeInfo == null) {
             return false
         }
@@ -169,8 +216,7 @@ class InjectCouponAccessibilityService : AccessibilityService() {
         nodeInfo.getBoundsInScreen(rect)
         val x = rect.centerX()
         val y = rect.centerY()
-        if (x < 0 || y < 0)
-            return false
+        if (x < 0 || y < 0) return false
         Log.e("acc_", "要点击的像素点在手机屏幕位置::" + rect.centerX() + " " + rect.centerY())
         val point = Point(x, y)
         val builder = GestureDescription.Builder()
@@ -196,7 +242,7 @@ class InjectCouponAccessibilityService : AccessibilityService() {
             return false
         }
         val rect = Rect()
-        Log.e("acc_", "要点击的像素点在手机屏幕位置::" + rect.centerX() + " " + rect.centerY())
+//        Log.e("acc_", "要点击的像素点在手机屏幕位置::" + rect.centerX() + " " + rect.centerY())
 
         val builder = GestureDescription.Builder()
         val path = Path()
@@ -267,5 +313,11 @@ class InjectCouponAccessibilityService : AccessibilityService() {
                 childNode.recycle()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        mainExecutor.cancel()
     }
 }
